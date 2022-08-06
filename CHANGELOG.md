@@ -2,6 +2,11 @@
 This file will maintain a list of changes per release of the rust-vk crate.
 
 
+## [2.0.0] - 2022-08-06
+### Changed
+- Return type of `Surface` to `Rc<RefCell<...>>` instead of `Arc<RwLock<...>>`. **[breaking]**
+
+
 ## [1.0.1] - 2022-08-06
 ### Fixed
 - Features not working (used `features` instead of `feature` in `#cfg[]`).
