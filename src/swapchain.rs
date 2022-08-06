@@ -12,10 +12,10 @@
 //!   Wraps around the SwapchainKHR to provide the Swapchain to the Game.
 // 
 
+use std::cell::RefCell;
 use std::ops::Deref;
 use std::ptr;
 use std::rc::Rc;
-use std::sync::{Arc, RwLock};
 
 use ash::vk;
 use ash::extensions::khr;
@@ -286,7 +286,7 @@ impl Swapchain {
     /// 
     /// # Returns
     /// A new Swapchain instance on success, or else an Error explaining what went wrong.
-    pub fn new(device: Rc<Device>, surface: Rc<Surface>, width: u32, height: u32, image_count: u32) -> Result<Arc<RwLock<Self>>, Error> {
+    pub fn new(device: Rc<Device>, surface: Rc<Surface>, width: u32, height: u32, image_count: u32) -> Result<Rc<RefCell<Self>>, Error> {
         // Prepare the swapchain info
         let (swapchain_info, format, extent, _mem) = match choose_swapchain_props(
             &device,
@@ -331,7 +331,7 @@ impl Swapchain {
         }
 
         // Store everything in a new Swapchain instance and return
-        Ok(Arc::new(RwLock::new(Self {
+        Ok(Rc::new(RefCell::new(Self {
             device,
             surface,
 
