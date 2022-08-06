@@ -29,7 +29,6 @@ jobs:
       run: |
         git clone https://github.com/google/swiftshader.git &&
         cd swiftshader &&
-        mkdir build &&
         cd build &&
         cmake ../ &&
         cmake --build . --parallel &&
