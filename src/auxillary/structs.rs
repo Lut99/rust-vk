@@ -377,7 +377,7 @@ impl Display for MonitorVideoMode {
     }
 }
 
-#[cfg(features = "winit")]
+#[cfg(feature = "winit")]
 impl From<winit::monitor::VideoMode> for MonitorVideoMode {
     #[inline]
     fn from(value: winit::monitor::VideoMode) -> Self {

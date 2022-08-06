@@ -4,7 +4,7 @@
 //  Created:
 //    26 Mar 2022, 14:09:20
 //  Last edited:
-//    06 Aug 2022, 11:36:20
+//    06 Aug 2022, 16:08:42
 //  Auto updated?
 //    Yes
 // 
@@ -35,7 +35,7 @@ pub mod sync;
 
 // Define some useful macros used within this crate
 /// Performs a `log`-crate `debug`, but only if that feature is defined
-#[cfg(features = "log")]
+#[cfg(feature = "log")]
 macro_rules! debug {
     (target: $target:expr, $($arg:tt)+) => {
         log::debug!($target, $($arg)+)
@@ -45,7 +45,7 @@ macro_rules! debug {
         log::debug!($($arg)+)
     };
 }
-#[cfg(not(features = "log"))]
+#[cfg(not(feature = "log"))]
 macro_rules! debug {
     (target: $target:expr, $($arg:tt)+) => { () };
 
@@ -54,7 +54,7 @@ macro_rules! debug {
 pub(crate) use debug;
 
 /// Performs a `log`-crate `info`, but only if that feature is defined
-#[cfg(features = "log")]
+#[cfg(feature = "log")]
 macro_rules! info {
     (target: $target:expr, $($arg:tt)+) => {
         log::info!($target, $($arg)+)
@@ -64,7 +64,7 @@ macro_rules! info {
         log::info!($($arg)+)
     };
 }
-#[cfg(not(features = "log"))]
+#[cfg(not(feature = "log"))]
 macro_rules! info {
     (target: $target:expr, $($arg:tt)+) => { () };
 
@@ -73,7 +73,7 @@ macro_rules! info {
 pub(crate) use info;
 
 /// Performs a `log`-crate `warn`, but only if that feature is defined
-#[cfg(features = "log")]
+#[cfg(feature = "log")]
 macro_rules! _warn {
     (target: $target:expr, $($arg:tt)+) => {
         log::warn!($target, $($arg)+)
@@ -83,7 +83,7 @@ macro_rules! _warn {
         log::warn!($($arg)+)
     };
 }
-#[cfg(not(features = "log"))]
+#[cfg(not(feature = "log"))]
 macro_rules! _warn {
     (target: $target:expr, $($arg:tt)+) => { () };
 
@@ -92,7 +92,7 @@ macro_rules! _warn {
 pub(crate) use _warn as warn;
 
 /// Performs a `log`-crate `error`, but only if that feature is defined
-#[cfg(features = "log")]
+#[cfg(feature = "log")]
 macro_rules! error {
     (target: $target:expr, $($arg:tt)+) => {
         log::error!($target, $($arg)+)
@@ -102,7 +102,7 @@ macro_rules! error {
         log::error!($($arg)+)
     };
 }
-#[cfg(not(features = "log"))]
+#[cfg(not(feature = "log"))]
 macro_rules! error {
     (target: $target:expr, $($arg:tt)+) => { () };
 

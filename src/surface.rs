@@ -4,7 +4,7 @@
 //  Created:
 //    01 Apr 2022, 17:26:26
 //  Last edited:
-//    06 Aug 2022, 11:46:36
+//    06 Aug 2022, 16:06:04
 //  Auto updated?
 //    Yes
 // 
@@ -20,7 +20,7 @@ use ash::{Entry as VkEntry, Instance as VkInstance};
 use ash::extensions::khr;
 use ash::vk::SurfaceKHR;
 
-#[cfg(features = "winit")]
+#[cfg(feature = "winit")]
 use winit::window::Window as WWindow;
 
 pub use crate::errors::SurfaceError as Error;
@@ -43,7 +43,7 @@ use crate::instance::Instance;
 /// 
 /// # Errors
 /// This function errors whenever the underlying APIs error.
-#[cfg(features = "winit")]
+#[cfg(feature = "winit")]
 #[cfg(all(windows))]
 unsafe fn create_surface(entry: &VkEntry, instance: &VkInstance, wwindow: &WWindow) -> Result<SurfaceKHR, Error> {
     use std::os::raw::c_void;
@@ -98,7 +98,7 @@ unsafe fn create_surface(entry: &VkEntry, instance: &VkInstance, wwindow: &WWind
 /// 
 /// # Errors
 /// This function errors whenever the underlying APIs error.
-#[cfg(features = "winit")]
+#[cfg(feature = "winit")]
 #[cfg(target_os = "macos")]
 unsafe fn create_surface(entry: &VkEntry, instance: &VkInstance, wwindow: &WWindow) -> Result<SurfaceKHR, Error> {
     use std::mem;
@@ -166,7 +166,7 @@ unsafe fn create_surface(entry: &VkEntry, instance: &VkInstance, wwindow: &WWind
 /// 
 /// # Errors
 /// This function errors whenever the underlying APIs error.
-#[cfg(features = "winit")]
+#[cfg(feature = "winit")]
 #[cfg(all(unix, not(target_os = "android"), not(target_os = "macos")))]
 unsafe fn create_surface(entry: &VkEntry, instance: &VkInstance, wwindow: &WWindow) -> Result<SurfaceKHR, Error> {
     use std::ptr;
@@ -268,8 +268,10 @@ impl Surface {
     /// 
     /// # Errors
     /// This function errors whenever the backend Vulkan errors.
-    #[cfg(features = "winit")]
+    #[cfg(feature = "winit")]
     pub fn new_winit(instance: Rc<Instance>, wwindow: &WWindow) -> Result<Rc<Self>, Error> {
+        use crate::debug;
+
         // Create the surface KHR
         debug!("Initializing surface...");
         let surface = unsafe { create_surface(instance.ash(), instance.vk(), wwindow) }?;
