@@ -1,0 +1,24 @@
+[package]
+name = "rust-vk"
+version = "1.0.0"
+edition = "2021"
+authors = [ "Lut99" ]
+description = "A wrapper crate around ash (and others) that provides a slightly more high-level, RAII implementation of (some of) Vulkan's structures."
+
+
+[dependencies]
+ash = { version = "0.37.0", features = ["loaded"] }
+log = { version = "0.4.16", optional = true }
+rust-embed = { version = "6.4.0" }
+semver = "1.0.6"
+winit = { version = "0.26.1", optional = true }
+
+
+[target.'cfg(all(windows))'.dependencies]
+winapi = { version = "0.3.5", features = ["windef", "libloaderapi"] }
+
+
+[target.'cfg(target_os = "macos")'.dependencies]
+metal = "0.24.0"
+cocoa = "0.18.4"
+objc  = "0.2.5"
