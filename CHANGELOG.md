@@ -2,11 +2,18 @@
 This file will maintain a list of changes per release of the game-vk crate.
 
 
-## [1.0.0] - 2022-05-15
+## [1.0.1] - 2022-08-06
+### Fixed
+- Features not working (used `features` instead of `feature` in `#cfg[]`).
+- Incorrect date in CHANGELOG.md for version 1.0.0.
+
+
+
+## [1.0.0] - 2022-08-06
 ### Added
 - Initial set of objects, taken from the [Game-Rust](https://github.com/Lut99/Game-Rust) project.
 - A README.md.
-- A .gitignore file
+- A .gitignore file.
 
 ### Changed
 - Some dependencies (`log` and `winit`) to be tied to a Cargo feature.
