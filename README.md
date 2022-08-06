@@ -1,6 +1,4 @@
 # rust-vk: A RAII-wrapper for ash
-[![CI status](https://github.com/Lut99/rust-vk/workflows/Continious%20integration/badge.svg)](https://github.com/Lut99/rust-vk/actions)
-
 A wrapper crate around ash (and others) that provides a slightly more high-level, RAII implementation of (some of) Vulkan's structures.
 
 
