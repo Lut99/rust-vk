@@ -1,5 +1,5 @@
 # Changelog
-This file will maintain a list of changes per release of the game-vk crate.
+This file will maintain a list of changes per release of the rust-vk crate.
 
 
 ## [1.0.1] - 2022-08-06
