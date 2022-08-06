@@ -4,7 +4,7 @@
 //  Created:
 //    25 Jun 2022, 18:04:08
 //  Last edited:
-//    06 Aug 2022, 11:40:30
+//    06 Aug 2022, 12:07:52
 //  Auto updated?
 //    Yes
 // 
@@ -32,7 +32,6 @@ use crate::pools::memory::spec::{GpuPtr, MemoryPool};
 mod tests {
     use std::cell::RefMut;
     use semver::Version;
-    use crate::auxillary::enums::InstanceLayer;
     use crate::auxillary::flags::DeviceMemoryTypeFlags;
     use crate::auxillary::structs::DeviceFeatures;
     use crate::instance::Instance;
@@ -41,7 +40,7 @@ mod tests {
     /// The instance extensions to use for the tests
     const INSTANCE_EXTENSIONS: &[&'static str] = &[];
     /// The instance layers to use for the tests
-    const INSTANCE_LAYERS: &[&'static str]     = &[ InstanceLayer::KhronosValidation.as_str() ];
+    const INSTANCE_LAYERS: &[&'static str]     = &[];
     /// The device extensions to use for the tests
     const DEVICE_EXTENSIONS: &[&'static str]   = &[];
     /// The device layers to use for the tests
