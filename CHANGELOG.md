@@ -2,6 +2,12 @@
 This file will maintain a list of changes per release of the rust-vk crate.
 
 
+## [2.0.1] - 2022-08-09
+### Added
+- `From<winit::dpi::PhysicalPosition>` implementation for `Offset2D` and vice versa.
+- `From<winit::dpi::PhysicalSize>` implementation for `Extent2D` and vice versa.
+
+
 ## [2.0.0] - 2022-08-06
 ### Changed
 - Return type of `Surface` to `Rc<RefCell<...>>` instead of `Arc<RwLock<...>>`. **[breaking]**

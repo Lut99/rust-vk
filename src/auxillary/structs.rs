@@ -4,7 +4,7 @@
 //  Created:
 //    09 Jul 2022, 12:22:50
 //  Last edited:
-//    06 Aug 2022, 11:48:36
+//    09 Aug 2022, 20:16:33
 //  Auto updated?
 //    Yes
 // 
@@ -134,6 +134,25 @@ impl<T> From<Offset2D<T>> for (T, T) {
     }
 }
 
+#[cfg(feature = "winit")]
+impl<T> From<winit::dpi::PhysicalPosition<T>> for Offset2D<T> {
+    #[inline]
+    fn from(value: winit::dpi::PhysicalPosition<T>) -> Self {
+        Self {
+            x: value.x,
+            y: value.y,
+        }
+    }
+}
+
+#[cfg(feature = "winit")]
+impl<T> From<Offset2D<T>> for winit::dpi::PhysicalPosition<T> {
+    #[inline]
+    fn from(value: Offset2D<T>) -> Self {
+        Self::new(value.x, value.y)
+    }
+}
+
 
 
 /// Defines a 2-dimensional extent with data type T.
@@ -217,6 +236,25 @@ impl<T> From<Extent2D<T>> for (T, T) {
     #[inline]
     fn from(value: Extent2D<T>) -> Self {
         (value.w, value.h)
+    }
+}
+
+#[cfg(feature = "winit")]
+impl<T> From<winit::dpi::PhysicalSize<T>> for Extent2D<T> {
+    #[inline]
+    fn from(value: winit::dpi::PhysicalSize<T>) -> Self {
+        Self {
+            w: value.width,
+            h: value.height,
+        }
+    }
+}
+
+#[cfg(feature = "winit")]
+impl<T> From<Extent2D<T>> for winit::dpi::PhysicalSize<T> {
+    #[inline]
+    fn from(value: Extent2D<T>) -> Self {
+        Self::new(value.w, value.h)
     }
 }
 
