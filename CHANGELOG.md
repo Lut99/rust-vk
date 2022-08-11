@@ -2,6 +2,11 @@
 This file will maintain a list of changes per release of the rust-vk crate.
 
 
+## [2.0.2] - 2022-08-11
+### Added
+- `PartialEq` and `Eq` to `Extent2D`, `Offset2D` and `Rect2D`.
+
+
 ## [2.0.1] - 2022-08-09
 ### Added
 - `From<winit::dpi::PhysicalPosition>` implementation for `Offset2D` and vice versa.

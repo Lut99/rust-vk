@@ -4,7 +4,7 @@
 //  Created:
 //    09 Jul 2022, 12:22:50
 //  Last edited:
-//    09 Aug 2022, 20:16:33
+//    11 Aug 2022, 15:27:09
 //  Auto updated?
 //    Yes
 // 
@@ -51,7 +51,7 @@ use crate::instance::Instance;
 
 /***** GEOMETRY *****/
 /// Defines a 2-dimensional offset with data type T.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Offset2D<T> {
     /// The X-coordinate of the offset.
     pub x : T,
@@ -156,7 +156,7 @@ impl<T> From<Offset2D<T>> for winit::dpi::PhysicalPosition<T> {
 
 
 /// Defines a 2-dimensional extent with data type T.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Extent2D<T> {
     /// The width of the extent.
     pub w : T,
@@ -261,7 +261,7 @@ impl<T> From<Extent2D<T>> for winit::dpi::PhysicalSize<T> {
 
 
 /// Defines a 2-dimensional rectangle with an offset (of datatype T) and an extent (of datatype U).
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Rect2D<T, U = T> {
     /// The offset of the top-left corner of the rectangle.
     pub offset : Offset2D<T>,
