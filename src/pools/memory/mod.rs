@@ -4,7 +4,7 @@
 //  Created:
 //    25 Jun 2022, 16:16:04
 //  Last edited:
-//    06 Aug 2022, 10:54:42
+//    11 Aug 2022, 16:30:50
 //  Auto updated?
 //    Yes
 // 
@@ -24,6 +24,6 @@ pub mod prelude {
 }
 
 // Bring some stuff into the module scope
-pub use buffers::{StagingBuffer, VertexBuffer};
+pub use buffers::{IndexBuffer, StagingBuffer, VertexBuffer};
 pub use spec::{Buffer, HostBuffer, LocalBuffer, MappedMemory, MemoryPool, TransferBuffer};
 pub use pools::{Error, BlockPool, LinearPool, MetaPool};

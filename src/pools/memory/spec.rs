@@ -4,7 +4,7 @@
 //  Created:
 //    28 May 2022, 17:10:55
 //  Last edited:
-//    06 Aug 2022, 11:19:39
+//    11 Aug 2022, 16:12:25
 //  Auto updated?
 //    Yes
 // 
@@ -524,6 +524,15 @@ impl From<GpuPtr> for vk::DeviceSize {
     }
 }
 
+
+
+
+/// Represents a common interface to Vertex definitions.
+pub trait Vertex: Sized {
+    /// Returns the size of this Vertex, in bytes.
+    #[inline]
+    fn vk_size() -> usize { std::mem::size_of::<Self>() }
+}
 
 
 

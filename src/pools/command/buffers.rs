@@ -4,7 +4,7 @@
 //  Created:
 //    05 May 2022, 10:45:36
 //  Last edited:
-//    06 Aug 2022, 11:12:03
+//    11 Aug 2022, 16:55:47
 //  Auto updated?
 //    Yes
 // 
@@ -27,7 +27,7 @@ use crate::device::Device;
 use crate::pipeline::Pipeline;
 use crate::render_pass::RenderPass;
 use crate::framebuffer::Framebuffer;
-use crate::pools::memory::{Buffer, VertexBuffer};
+use crate::pools::memory::{Buffer, IndexBuffer, VertexBuffer};
 use crate::pools::command::Pool as CommandPool;
 
 
@@ -295,6 +295,18 @@ impl CommandBuffer {
         // Call the function
         unsafe {
             self.device.cmd_bind_vertex_buffers(self.buffer, index as u32, &buffers, &offsets);
+        }
+    }
+
+    /// Binds a single index buffer for the next `CommandBuffer::draw()`-call.
+    /// 
+    /// # Arguments
+    /// - `index_buffer`: The IndexBuffers to bind.
+    #[inline]
+    pub fn bind_index_buffer(&self, index_buffer: &Rc<IndexBuffer>) {
+        // Call the function
+        unsafe {
+            self.device.cmd_bind_index_buffer(self.buffer, index_buffer.vk(), index_buffer.vk_offset(), index_buffer.index_type().into());
         }
     }
 

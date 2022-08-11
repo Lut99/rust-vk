@@ -4,7 +4,7 @@
 //  Created:
 //    09 Jul 2022, 12:23:22
 //  Last edited:
-//    06 Aug 2022, 11:40:14
+//    11 Aug 2022, 16:49:27
 //  Auto updated?
 //    Yes
 // 
@@ -249,6 +249,8 @@ pub enum DeviceExtension {
     Swapchain,
     /// The portability subset extension.
     PortabilitySubset,
+    /// The 8-bit index extension.
+    SmallIndices,
 }
 
 impl DeviceExtension {
@@ -259,6 +261,7 @@ impl DeviceExtension {
         match self {
             Swapchain         => "VK_KHR_swapchain",
             PortabilitySubset => "VK_KHR_portability_subset",
+            SmallIndices      => "VK_EXT_index_type_uint8",
         }
     }
 }
@@ -284,6 +287,7 @@ impl FromStr for DeviceExtension {
         match value {
             "VK_KHR_swapchain"          => Ok(DeviceExtension::Swapchain),
             "VK_KHR_portability_subset" => Ok(DeviceExtension::PortabilitySubset),
+            "VK_EXT_index_type_uint8"   => Ok(DeviceExtension::SmallIndices),
             value                       => Err(ExtensionError::UnknownDeviceExtension{ got: value.into() }),
         }
     }
@@ -1053,6 +1057,39 @@ impl From<SharingMode> for (vk::SharingMode, Option<Vec<u32>>) {
         }
     }
 }
+
+
+
+/// Determines the type of indices in an IndexBuffer.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum IndexType {
+    /// An 8-bit index type (i.e., unsigned 8-bit integer).
+    /// 
+    /// Note that for this IndexType, an extension is needed (VK_EXT_index_type_uint8)
+    UInt8,
+    /// A 16-bit index type (i.e., unsigned 16-bit integer).
+    UInt16,
+    /// A 32-bit index type (i.e., unsigned 32-bit integer).
+    UInt32,
+}
+
+impl IndexType {
+    /// Returns the size (in bytes) of this IndexType.
+    #[inline]
+    pub fn vk_size(&self) -> usize {
+        match self {
+            IndexType::UInt8  => 1,
+            IndexType::UInt16 => 2,
+            IndexType::UInt32 => 4,
+        }
+    }
+}
+
+enum_from!(impl From<vk::IndexType> for IndexType {
+    vk::IndexType::UINT8_EXT => IndexType::UInt8,
+    vk::IndexType::UINT16    => IndexType::UInt16,
+    vk::IndexType::UINT32    => IndexType::UInt32,
+});
 
 
 

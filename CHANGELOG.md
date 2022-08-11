@@ -2,6 +2,18 @@
 This file will maintain a list of changes per release of the rust-vk crate.
 
 
+## [3.0.0] - 2022-08-11
+### Added
+- The new `IndexType` auxillary type.
+- The new `IndexBuffer` buffer type.
+- `StagingBuffer` now accepts another Buffer to initialize itself for with the `StagingBuffer::new_for` constructor.
+- `CommandBuffer::bind_index_buffer()` to the `CommandBuffer` struct.
+
+## Changed
+- `VertexBuffer` now accepts a buffer type and a number of vertices instead of a total capacity. **[breaking]**
+- All of the buffer's constructors (i.e., that of `StagingBuffer` and `VertexBuffer`) to choose a default value of `SharingMode::Exclusive` for the sharing_mode. Instead, a new constructor, `::new_with_sharing_mode`, that takes the SharingMode too.
+
+
 ## [2.0.2] - 2022-08-11
 ### Added
 - `PartialEq` and `Eq` to `Extent2D`, `Offset2D` and `Rect2D`.

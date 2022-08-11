@@ -9,6 +9,7 @@ description = "A wrapper crate around ash (and others) that provides a slightly 
 [dependencies]
 ash = { version = "0.37.0", features = ["loaded"] }
 log = { version = "0.4.16", optional = true }
+memoffset = "0.6.5"
 rust-embed = { version = "6.4.0" }
 semver = "1.0.6"
 winit = { version = "0.26.1", optional = true }
