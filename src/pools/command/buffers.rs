@@ -4,7 +4,7 @@
 //  Created:
 //    05 May 2022, 10:45:36
 //  Last edited:
-//    11 Aug 2022, 16:55:47
+//    13 Aug 2022, 12:34:22
 //  Auto updated?
 //    Yes
 // 
@@ -315,8 +315,8 @@ impl CommandBuffer {
     /// # Arguments
     /// - `n_vertices`: The number of vertices to draw.
     /// - `n_instances`: The number of instances to draw.
-    /// - `first_vertex`: The first vertex in the buffer to draw.
-    /// - `first_instance`: The first instance in the buffer to draw.
+    /// - `first_vertex`: The position of the first vertex in the buffer to draw.
+    /// - `first_instance`: The position of the first instance in the buffer to draw.
     /// 
     /// # Errors
     /// This function does not error directly, but may pass errors on to `CommandBuffer::end()`.
@@ -324,6 +324,24 @@ impl CommandBuffer {
     pub fn draw(&self, n_vertices: u32, n_instances: u32, first_vertex: u32, first_instance: u32) {
         unsafe {
             self.device.cmd_draw(self.buffer, n_vertices, n_instances, first_vertex, first_instance);
+        }
+    }
+
+    /// Records a draw call that also uses an index buffer.
+    /// 
+    /// # Arguments
+    /// - `n_indices`: The number of indices to draw.
+    /// - `n_instances`: The number of instances to draw.
+    /// - `first_index`: The position of the first index in the buffer to draw.
+    /// - `vertex_offset`: An offset to apply to all indices into the vertex buffer.
+    /// - `first_instance`: The position of the first instance in the buffer to draw.
+    /// 
+    /// # Errors
+    /// This function does not error directly, but may pass errors on to `CommandBuffer::end()`.
+    #[inline]
+    pub fn draw_indexed(&self, n_indices: u32, n_instances: u32, first_index: u32, vertex_offset: i32, first_instance: u32) {
+        unsafe {
+            self.device.cmd_draw_indexed(self.buffer, n_indices, n_instances, first_index, vertex_offset, first_instance);
         }
     }
 

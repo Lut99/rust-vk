@@ -8,6 +8,7 @@ This file will maintain a list of changes per release of the rust-vk crate.
 - The new `IndexBuffer` buffer type.
 - `StagingBuffer` now accepts another Buffer to initialize itself for with the `StagingBuffer::new_for` constructor.
 - `CommandBuffer::bind_index_buffer()` to the `CommandBuffer` struct.
+- `CommandBuffer::draw_indexed()` to the `CommandBuffer` struct.
 
 ## Changed
 - `VertexBuffer` now accepts a buffer type and a number of vertices instead of a total capacity. **[breaking]**
