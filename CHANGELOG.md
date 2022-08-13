@@ -2,6 +2,14 @@
 This file will maintain a list of changes per release of the rust-vk crate.
 
 
+## [3.0.1] - 2022-08-13
+### Added
+- `vk_attributes` to the `Vertex` struct.
+
+### Fixed
+- `StagingBuffer::new_for()` accepting a non-Rc reference (which was incompatible with the Rc-style buffers).
+
+
 ## [3.0.0] - 2022-08-11
 ### Added
 - The new `IndexType` auxillary type.

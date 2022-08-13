@@ -4,7 +4,7 @@
 //  Created:
 //    28 May 2022, 17:10:55
 //  Last edited:
-//    11 Aug 2022, 16:12:25
+//    13 Aug 2022, 12:46:42
 //  Auto updated?
 //    Yes
 // 
@@ -26,7 +26,7 @@ use crate::warn;
 pub use crate::pools::errors::MemoryPoolError as Error;
 use crate::auxillary::enums::SharingMode;
 use crate::auxillary::flags::{BufferUsageFlags, CommandBufferFlags, CommandBufferUsageFlags, MemoryPropertyFlags};
-use crate::auxillary::structs::MemoryRequirements;
+use crate::auxillary::structs::{MemoryRequirements, VertexAttribute};
 use crate::device::Device;
 use crate::pools::command::{Buffer as CommandBuffer, Pool as CommandPool};
 
@@ -529,6 +529,12 @@ impl From<GpuPtr> for vk::DeviceSize {
 
 /// Represents a common interface to Vertex definitions.
 pub trait Vertex: Sized {
+    /// Returns the descriptions that list the attributes (=fields) for this Vertex.
+    /// 
+    /// # Returns
+    /// A list of VertexAttributeDescription that describes the attributes for this Vertex.
+    fn vk_attributes() -> Vec<VertexAttribute>;
+
     /// Returns the size of this Vertex, in bytes.
     #[inline]
     fn vk_size() -> usize { std::mem::size_of::<Self>() }

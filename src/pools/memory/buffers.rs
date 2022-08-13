@@ -4,7 +4,7 @@
 //  Created:
 //    25 Jun 2022, 16:17:19
 //  Last edited:
-//    11 Aug 2022, 20:19:21
+//    13 Aug 2022, 12:45:02
 //  Auto updated?
 //    Yes
 // 
@@ -202,7 +202,7 @@ impl StagingBuffer {
     /// # Errors
     /// This function may error if the buffer creation in the Vulkan backend failed.
     #[inline]
-    pub fn new_for(buffer: &dyn Buffer) -> Result<Rc<Self>, Error> {
+    pub fn new_for(buffer: &Rc<dyn Buffer>) -> Result<Rc<Self>, Error> {
         // Call the normal constructor with the siphoned values.
         Self::new(buffer.device().clone(), buffer.pool().clone(), buffer.capacity())
     }

@@ -4,7 +4,7 @@
 //  Created:
 //    25 Jun 2022, 16:16:04
 //  Last edited:
-//    11 Aug 2022, 16:30:50
+//    13 Aug 2022, 12:47:42
 //  Auto updated?
 //    Yes
 // 
@@ -20,7 +20,7 @@ pub mod buffers;
 
 // Define a prelude to import
 pub mod prelude {
-    pub use super::spec::{Buffer, HostBuffer, LocalBuffer, MemoryPool, TransferBuffer};
+    pub use super::spec::{Buffer, HostBuffer, LocalBuffer, MemoryPool, TransferBuffer, Vertex};
 }
 
 // Bring some stuff into the module scope
