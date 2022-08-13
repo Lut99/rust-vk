@@ -2,6 +2,11 @@
 This file will maintain a list of changes per release of the rust-vk crate.
 
 
+## [4.0.1] - 2022-08-13
+### Fixed
+- Old reference to `device_name` and `device_type` in the `Device`'s constructor.
+
+
 ## [4.0.0] - 2022-08-13
 ### Added
 - `Device` now caches the device properties on creation, which may be returned using `Device::get_physical_device_props()`.

@@ -4,7 +4,7 @@
 //  Created:
 //    27 Mar 2022, 13:19:36
 //  Last edited:
-//    13 Aug 2022, 17:09:25
+//    13 Aug 2022, 17:21:47
 //  Auto updated?
 //    Yes
 // 
@@ -253,7 +253,7 @@ impl Device {
 
 
         // Do some debug prints about the selected device
-        debug!("Using physical device {} '{}' ({})", physical_device_index, &device_name, &device_type);
+        debug!("Using physical device {} '{}' ({})", physical_device_index, &device_properties.name, &device_properties.kind);
         debug!("Selected queue families:");
         debug!(" - Graphics : {}", family_info.graphics);
         debug!(" - Memory   : {}", family_info.memory);
