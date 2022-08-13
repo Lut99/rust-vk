@@ -2,6 +2,15 @@
 This file will maintain a list of changes per release of the rust-vk crate.
 
 
+## [4.0.0] - 2022-08-13
+### Added
+- `Device` now caches the device properties on creation, which may be returned using `Device::get_physical_device_props()`.
+- Auxillary `PhysicalDeviceProperties` struct and related ones (`PhysicalDeviceLimits` and `PhysicalDeviceSparseProperties`).
+
+### Changed
+- `Device::kind()` now returns a direct DeviceKind instead of a reference. **[breaking]**
+
+
 ## [3.0.1] - 2022-08-13
 ### Added
 - `vk_attributes` to the `Vertex` struct.

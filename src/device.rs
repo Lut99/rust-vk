@@ -4,7 +4,7 @@
 //  Created:
 //    27 Mar 2022, 13:19:36
 //  Last edited:
-//    06 Aug 2022, 10:55:13
+//    13 Aug 2022, 17:09:25
 //  Auto updated?
 //    Yes
 // 
@@ -24,7 +24,7 @@ use crate::{debug, to_cstring};
 pub use crate::errors::DeviceError as Error;
 use crate::log_destroy;
 use crate::auxillary::enums::{DeviceKind, QueueKind};
-use crate::auxillary::structs::{DeviceFeatures, DeviceInfo, QueueFamilyInfo, SwapchainSupport};
+use crate::auxillary::structs::{DeviceFeatures, DeviceInfo, PhysicalDeviceProperties, QueueFamilyInfo, SwapchainSupport};
 use crate::instance::Instance;
 use crate::surface::Surface;
 use crate::queue::Queues;
@@ -187,10 +187,12 @@ pub struct Device {
 
     /// The index of the device
     index    : usize,
-    /// The name of the device
-    name     : String,
-    /// The type of the device (as a String as well)
-    kind     : DeviceKind,
+    /// The PhysicalDevice properties that stores information about the device.
+    props    : PhysicalDeviceProperties,
+    // /// The name of the device
+    // name     : String,
+    // /// The type of the device (as a String as well)
+    // kind     : DeviceKind,
     /// The QueueFamilyInfo that describes the queue families for this device.
     families : QueueFamilyInfo,
 }
@@ -231,19 +233,19 @@ impl Device {
 
 
         // Get the properties of this device
-        let device_properties = unsafe { instance.get_physical_device_properties(physical_device) };
+        let device_properties: PhysicalDeviceProperties = unsafe { instance.get_physical_device_properties(physical_device) }.into();
 
-        // Get a readable name and type
-        let device_name: String = match unsafe { CStr::from_ptr(device_properties.device_name.as_ptr()) }.to_str() {
-            Ok(name) => name.to_string(),
-            Err(err) => { return Err(Error::PhysicalDeviceNameError{ index: physical_device_index, err }); }
-        };
-        let device_type: DeviceKind = device_properties.device_type.into();
+        // // Get a readable name and type
+        // let device_name: String = match unsafe { CStr::from_ptr(device_properties.device_name.as_ptr()) }.to_str() {
+        //     Ok(name) => name.to_string(),
+        //     Err(err) => { return Err(Error::PhysicalDeviceNameError{ index: physical_device_index, err }); }
+        // };
+        // let device_type: DeviceKind = device_properties.device_type.into();
 
 
 
         // Collect the queue families for this device
-        let family_info = match QueueFamilyInfo::new(&instance, physical_device, physical_device_index, &device_name) {
+        let family_info = match QueueFamilyInfo::new(&instance, physical_device, physical_device_index, &device_properties.name) {
             Ok(info) => info,
             Err(err) => { return Err(Error::QueueFamilyError{ index: physical_device_index, err }); }
         };
@@ -281,7 +283,7 @@ impl Device {
 
         // Create the DeviceCreateInfo with all this
         let vk_device_features: vk::PhysicalDeviceFeatures = device_features.into();
-        let device_info = populate_device_info(&instance, physical_device, physical_device_index, &device_name, &queue_infos, &p_device_extensions, &p_device_layers, &vk_device_features)?;
+        let device_info = populate_device_info(&instance, physical_device, physical_device_index, &device_properties.name, &queue_infos, &p_device_extensions, &p_device_layers, &vk_device_features)?;
 
         // Use that to create the device
         debug!("Initializing device...");
@@ -306,8 +308,7 @@ impl Device {
             queues,
 
             index    : physical_device_index,
-            name     : device_name,
-            kind     : device_type,
+            props    : device_properties,
             families : family_info,
         }))
     }
@@ -455,6 +456,10 @@ impl Device {
 
 
 
+    /// Returns a (cached) list of physical device properties.
+    #[inline]
+    pub fn get_physical_device_props(&self) -> &PhysicalDeviceProperties { &self.props }
+
     /// Returns the list of supported features for the given Surface.
     /// 
     /// # Arguments
@@ -539,11 +544,11 @@ impl Device {
 
     /// Returns the name of this device.
     #[inline]
-    pub fn name(&self) -> &str { &self.name }
+    pub fn name(&self) -> &str { &self.props.name }
     
     /// Returns the type of this device.
     #[inline]
-    pub fn kind(&self) -> &DeviceKind { &self.kind }
+    pub fn kind(&self) -> DeviceKind { self.props.kind }
     
     /// Returns information about the QueueFamilies for this device.
     #[inline]

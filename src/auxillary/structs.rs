@@ -4,7 +4,7 @@
 //  Created:
 //    09 Jul 2022, 12:22:50
 //  Last edited:
-//    11 Aug 2022, 15:27:09
+//    13 Aug 2022, 17:11:35
 //  Auto updated?
 //    Yes
 // 
@@ -13,6 +13,7 @@
 //!   Vulkan
 // 
 
+use std::ffi::{CStr, CString};
 use std::fmt::{Display, Formatter, Result as FResult};
 use std::ops::Range;
 use std::ptr;
@@ -22,7 +23,8 @@ use std::slice;
 use ash::vk;
 
 use crate::errors::QueueError;
-use crate::vec_as_ptr;
+use crate::{to_cstring, vec_as_ptr};
+use crate::spec::{ApiVersion, DriverVersion};
 use crate::auxillary::enums::{
     AttachmentLoadOp, AttachmentStoreOp, AttributeLayout,
     BindPoint, BlendFactor, BlendOp,
@@ -357,6 +359,467 @@ where
         Self {
             offset : value.offset.into(),
             extent : value.extent.into(),
+        }
+    }
+}
+
+
+
+
+
+/***** PHYSICAL DEVICES *****/
+/// Contains the properties of a physical device.
+#[derive(Clone, Debug)]
+pub struct PhysicalDeviceProperties {
+    /// The name of the device.
+    pub name : String,
+    /// The type of the device.
+    pub kind : DeviceKind,
+
+    /// The API version maximally supported by the Device.
+    pub api_version    : ApiVersion,
+    /// The driver version maximally supported by the Device. The actual encoding is vendor-specific.
+    pub driver_version : DriverVersion,
+    /// The vendor identifier.
+    pub vendor_id      : u32,
+    /// The device identifier (vendor-unique, I assume).
+    pub device_id      : u32,
+    /// The UUID of this device w.r.t. pipeline caches.
+    pub pipeline_cache_uuid : [u8; vk::UUID_SIZE],
+
+    /// A struct describing all sorts of limits for this Device.
+    pub limits : PhysicalDeviceLimits,
+    /// A struct describing the sparse matrix properties supported by this device.
+    pub sparse : PhysicalDeviceSparseProperties,
+}
+
+impl From<vk::PhysicalDeviceProperties> for PhysicalDeviceProperties {
+    fn from(value: vk::PhysicalDeviceProperties) -> Self {
+        // Convert the name into a normal string
+        let name: &str = unsafe{ CStr::from_ptr(value.device_name.as_ptr()) }.to_str().unwrap_or_else(|err| panic!("Failed to convert device name to String: {}", err));
+
+        // Return the proper struct
+        Self {
+            name : name.into(),
+            kind : value.device_type.into(),
+
+            api_version         : value.api_version.into(),
+            driver_version      : value.driver_version.into(),
+            vendor_id           : value.vendor_id,
+            device_id           : value.device_id,
+            pipeline_cache_uuid : value.pipeline_cache_uuid,
+
+            limits : value.limits.into(),
+            sparse : value.sparse_properties.into(),
+        }
+    }
+}
+
+impl From<PhysicalDeviceProperties> for vk::PhysicalDeviceProperties {
+    fn from(value: PhysicalDeviceProperties) -> Self {
+        // Convert the name to a C-string
+        let name_len = value.name.len();
+        if name_len > vk::MAX_PHYSICAL_DEVICE_NAME_SIZE { panic!("Device name '{}' is too long", value.name); }
+        let cname : CString = to_cstring!(value.name);
+        let mut bname : [ i8; vk::MAX_PHYSICAL_DEVICE_NAME_SIZE ] = [ 0; vk::MAX_PHYSICAL_DEVICE_NAME_SIZE ];
+        bname.copy_from_slice(unsafe{ slice::from_raw_parts(CString::as_bytes_with_nul(&cname).as_ptr() as *const i8, name_len) });
+
+        // Return a new Vulkan counterpart
+        Self {
+            device_name : bname,
+            device_type : value.kind.into(),
+
+            api_version         : value.api_version.into(),
+            driver_version      : value.driver_version.into(),
+            vendor_id           : value.vendor_id,
+            device_id           : value.device_id,
+            pipeline_cache_uuid : value.pipeline_cache_uuid,
+
+            limits            : value.limits.into(),
+            sparse_properties : value.sparse.into(),
+        }
+    }
+}
+
+
+
+/// Contains the limits of a specified PhysicalDevice.
+#[derive(Clone, Debug)]
+pub struct PhysicalDeviceLimits {
+    pub max_image_dimension_1d : u32,
+    pub max_image_dimension_2d : u32,
+    pub max_image_dimension_3d : u32,
+    pub max_image_dimension_cube : u32,
+    pub max_image_array_layers : u32,
+    pub max_texel_buffer_elements : u32,
+    pub max_uniform_buffer_range : u32,
+    pub max_storage_buffer_range : u32,
+    pub max_push_constants_size : u32,
+    pub max_memory_allocation_count : u32,
+    pub max_sampler_allocation_count : u32,
+    pub buffer_image_granularity : vk::DeviceSize,
+    pub sparse_address_space_size : vk::DeviceSize,
+    pub max_bound_descriptor_sets : u32,
+    pub max_per_stage_descriptor_samplers : u32,
+    pub max_per_stage_descriptor_uniform_buffers : u32,
+    pub max_per_stage_descriptor_storage_buffers : u32,
+    pub max_per_stage_descriptor_sampled_images : u32,
+    pub max_per_stage_descriptor_storage_images : u32,
+    pub max_per_stage_descriptor_input_attachments : u32,
+    pub max_per_stage_resources : u32,
+    pub max_descriptor_set_samplers : u32,
+    pub max_descriptor_set_uniform_buffers : u32,
+    pub max_descriptor_set_uniform_buffers_dynamic : u32,
+    pub max_descriptor_set_storage_buffers : u32,
+    pub max_descriptor_set_storage_buffers_dynamic : u32,
+    pub max_descriptor_set_sampled_images : u32,
+    pub max_descriptor_set_storage_images : u32,
+    pub max_descriptor_set_input_attachments : u32,
+    pub max_vertex_input_attributes : u32,
+    pub max_vertex_input_bindings : u32,
+    pub max_vertex_input_attribute_offset : u32,
+    pub max_vertex_input_binding_stride : u32,
+    pub max_vertex_output_components : u32,
+    pub max_tessellation_generation_level : u32,
+    pub max_tessellation_patch_size : u32,
+    pub max_tessellation_control_per_vertex_input_components : u32,
+    pub max_tessellation_control_per_vertex_output_components : u32,
+    pub max_tessellation_control_per_patch_output_components : u32,
+    pub max_tessellation_control_total_output_components : u32,
+    pub max_tessellation_evaluation_input_components : u32,
+    pub max_tessellation_evaluation_output_components : u32,
+    pub max_geometry_shader_invocations : u32,
+    pub max_geometry_input_components : u32,
+    pub max_geometry_output_components : u32,
+    pub max_geometry_output_vertices : u32,
+    pub max_geometry_total_output_components : u32,
+    pub max_fragment_input_components : u32,
+    pub max_fragment_output_attachments : u32,
+    pub max_fragment_dual_src_attachments : u32,
+    pub max_fragment_combined_output_resources : u32,
+    pub max_compute_shared_memory_size : u32,
+    pub max_compute_work_group_count : [ u32; 3 ],
+    pub max_compute_work_group_invocations : u32,
+    pub max_compute_work_group_size : [ u32; 3 ],
+    pub sub_pixel_precision_bits : u32,
+    pub sub_texel_precision_bits : u32,
+    pub mipmap_precision_bits : u32,
+    pub max_draw_indexed_index_value : u32,
+    pub max_draw_indirect_count : u32,
+    pub max_sampler_lod_bias : f32,
+    pub max_sampler_anisotropy : f32,
+    pub max_viewports : u32,
+    pub max_viewport_dimensions : [ u32; 2 ],
+    pub viewport_bounds_range : [ f32; 2 ],
+    pub viewport_sub_pixel_bits : u32,
+    pub min_memory_map_alignment : usize,
+    pub min_texel_buffer_offset_alignment : vk::DeviceSize,
+    pub min_uniform_buffer_offset_alignment : vk::DeviceSize,
+    pub min_storage_buffer_offset_alignment : vk::DeviceSize,
+    pub min_texel_offset : i32,
+    pub max_texel_offset : u32,
+    pub min_texel_gather_offset : i32,
+    pub max_texel_gather_offset : u32,
+    pub min_interpolation_offset : f32,
+    pub max_interpolation_offset : f32,
+    pub sub_pixel_interpolation_offset_bits : u32,
+    pub max_framebuffer_width : u32,
+    pub max_framebuffer_height : u32,
+    pub max_framebuffer_layers : u32,
+    pub framebuffer_color_sample_counts : SampleCount,
+    pub framebuffer_depth_sample_counts : SampleCount,
+    pub framebuffer_stencil_sample_counts : SampleCount,
+    pub framebuffer_no_attachments_sample_counts : SampleCount,
+    pub max_color_attachments : u32,
+    pub sampled_image_color_sample_counts : SampleCount,
+    pub sampled_image_integer_sample_counts : SampleCount,
+    pub sampled_image_depth_sample_counts : SampleCount,
+    pub sampled_image_stencil_sample_counts : SampleCount,
+    pub storage_image_sample_counts : SampleCount,
+    pub max_sample_mask_words : u32,
+    pub timestamp_compute_and_graphics : bool,
+    pub timestamp_period : f32,
+    pub max_clip_distances : u32,
+    pub max_cull_distances : u32,
+    pub max_combined_clip_and_cull_distances : u32,
+    pub discrete_queue_priorities : u32,
+    pub point_size_range : [ f32; 2 ],
+    pub line_width_range : [ f32; 2 ],
+    pub point_size_granularity : f32,
+    pub line_width_granularity : f32,
+    pub strict_lines : bool,
+    pub standard_sample_locations : bool,
+    pub optimal_buffer_copy_offset_alignment : vk::DeviceSize,
+    pub optimal_buffer_copy_row_pitch_alignment : vk::DeviceSize,
+    pub non_coherent_atom_size : vk::DeviceSize,
+}
+
+impl From<vk::PhysicalDeviceLimits> for PhysicalDeviceLimits {
+    fn from(value: vk::PhysicalDeviceLimits) -> Self {
+        Self {
+            max_image_dimension_1d                                : value.max_image_dimension1_d,
+            max_image_dimension_2d                                : value.max_image_dimension2_d,
+            max_image_dimension_3d                                : value.max_image_dimension3_d,
+            max_image_dimension_cube                              : value.max_image_dimension_cube,
+            max_image_array_layers                                : value.max_image_array_layers,
+            max_texel_buffer_elements                             : value.max_texel_buffer_elements,
+            max_uniform_buffer_range                              : value.max_uniform_buffer_range,
+            max_storage_buffer_range                              : value.max_storage_buffer_range,
+            max_push_constants_size                               : value.max_push_constants_size,
+            max_memory_allocation_count                           : value.max_memory_allocation_count,
+            max_sampler_allocation_count                          : value.max_sampler_allocation_count,
+            buffer_image_granularity                              : value.buffer_image_granularity,
+            sparse_address_space_size                             : value.sparse_address_space_size,
+            max_bound_descriptor_sets                             : value.max_bound_descriptor_sets,
+            max_per_stage_descriptor_samplers                     : value.max_per_stage_descriptor_samplers,
+            max_per_stage_descriptor_uniform_buffers              : value.max_per_stage_descriptor_uniform_buffers,
+            max_per_stage_descriptor_storage_buffers              : value.max_per_stage_descriptor_storage_buffers,
+            max_per_stage_descriptor_sampled_images               : value.max_per_stage_descriptor_sampled_images,
+            max_per_stage_descriptor_storage_images               : value.max_per_stage_descriptor_storage_images,
+            max_per_stage_descriptor_input_attachments            : value.max_per_stage_descriptor_input_attachments,
+            max_per_stage_resources                               : value.max_per_stage_resources,
+            max_descriptor_set_samplers                           : value.max_descriptor_set_samplers,
+            max_descriptor_set_uniform_buffers                    : value.max_descriptor_set_uniform_buffers,
+            max_descriptor_set_uniform_buffers_dynamic            : value.max_descriptor_set_uniform_buffers_dynamic,
+            max_descriptor_set_storage_buffers                    : value.max_descriptor_set_storage_buffers,
+            max_descriptor_set_storage_buffers_dynamic            : value.max_descriptor_set_storage_buffers_dynamic,
+            max_descriptor_set_sampled_images                     : value.max_descriptor_set_sampled_images,
+            max_descriptor_set_storage_images                     : value.max_descriptor_set_storage_images,
+            max_descriptor_set_input_attachments                  : value.max_descriptor_set_input_attachments,
+            max_vertex_input_attributes                           : value.max_vertex_input_attributes,
+            max_vertex_input_bindings                             : value.max_vertex_input_bindings,
+            max_vertex_input_attribute_offset                     : value.max_vertex_input_attribute_offset,
+            max_vertex_input_binding_stride                       : value.max_vertex_input_binding_stride,
+            max_vertex_output_components                          : value.max_vertex_output_components,
+            max_tessellation_generation_level                     : value.max_tessellation_generation_level,
+            max_tessellation_patch_size                           : value.max_tessellation_patch_size,
+            max_tessellation_control_per_vertex_input_components  : value.max_tessellation_control_per_vertex_input_components,
+            max_tessellation_control_per_vertex_output_components : value.max_tessellation_control_per_vertex_output_components,
+            max_tessellation_control_per_patch_output_components  : value.max_tessellation_control_per_patch_output_components,
+            max_tessellation_control_total_output_components      : value.max_tessellation_control_total_output_components,
+            max_tessellation_evaluation_input_components          : value.max_tessellation_evaluation_input_components,
+            max_tessellation_evaluation_output_components         : value.max_tessellation_evaluation_output_components,
+            max_geometry_shader_invocations                       : value.max_geometry_shader_invocations,
+            max_geometry_input_components                         : value.max_geometry_input_components,
+            max_geometry_output_components                        : value.max_geometry_output_components,
+            max_geometry_output_vertices                          : value.max_geometry_output_vertices,
+            max_geometry_total_output_components                  : value.max_geometry_total_output_components,
+            max_fragment_input_components                         : value.max_fragment_input_components,
+            max_fragment_output_attachments                       : value.max_fragment_output_attachments,
+            max_fragment_dual_src_attachments                     : value.max_fragment_dual_src_attachments,
+            max_fragment_combined_output_resources                : value.max_fragment_combined_output_resources,
+            max_compute_shared_memory_size                        : value.max_compute_shared_memory_size,
+            max_compute_work_group_count                          : value.max_compute_work_group_count,
+            max_compute_work_group_invocations                    : value.max_compute_work_group_invocations,
+            max_compute_work_group_size                           : value.max_compute_work_group_size,
+            sub_pixel_precision_bits                              : value.sub_pixel_precision_bits,
+            sub_texel_precision_bits                              : value.sub_texel_precision_bits,
+            mipmap_precision_bits                                 : value.mipmap_precision_bits,
+            max_draw_indexed_index_value                          : value.max_draw_indexed_index_value,
+            max_draw_indirect_count                               : value.max_draw_indirect_count,
+            max_sampler_lod_bias                                  : value.max_sampler_lod_bias,
+            max_sampler_anisotropy                                : value.max_sampler_anisotropy,
+            max_viewports                                         : value.max_viewports,
+            max_viewport_dimensions                               : value.max_viewport_dimensions,
+            viewport_bounds_range                                 : value.viewport_bounds_range,
+            viewport_sub_pixel_bits                               : value.viewport_sub_pixel_bits,
+            min_memory_map_alignment                              : value.min_memory_map_alignment,
+            min_texel_buffer_offset_alignment                     : value.min_texel_buffer_offset_alignment,
+            min_uniform_buffer_offset_alignment                   : value.min_uniform_buffer_offset_alignment,
+            min_storage_buffer_offset_alignment                   : value.min_storage_buffer_offset_alignment,
+            min_texel_offset                                      : value.min_texel_offset,
+            max_texel_offset                                      : value.max_texel_offset,
+            min_texel_gather_offset                               : value.min_texel_gather_offset,
+            max_texel_gather_offset                               : value.max_texel_gather_offset,
+            min_interpolation_offset                              : value.min_interpolation_offset,
+            max_interpolation_offset                              : value.max_interpolation_offset,
+            sub_pixel_interpolation_offset_bits                   : value.sub_pixel_interpolation_offset_bits,
+            max_framebuffer_width                                 : value.max_framebuffer_width,
+            max_framebuffer_height                                : value.max_framebuffer_height,
+            max_framebuffer_layers                                : value.max_framebuffer_layers,
+            framebuffer_color_sample_counts                       : value.framebuffer_color_sample_counts.into(),
+            framebuffer_depth_sample_counts                       : value.framebuffer_depth_sample_counts.into(),
+            framebuffer_stencil_sample_counts                     : value.framebuffer_stencil_sample_counts.into(),
+            framebuffer_no_attachments_sample_counts              : value.framebuffer_no_attachments_sample_counts.into(),
+            max_color_attachments                                 : value.max_color_attachments,
+            sampled_image_color_sample_counts                     : value.sampled_image_color_sample_counts.into(),
+            sampled_image_integer_sample_counts                   : value.sampled_image_integer_sample_counts.into(),
+            sampled_image_depth_sample_counts                     : value.sampled_image_depth_sample_counts.into(),
+            sampled_image_stencil_sample_counts                   : value.sampled_image_stencil_sample_counts.into(),
+            storage_image_sample_counts                           : value.storage_image_sample_counts.into(),
+            max_sample_mask_words                                 : value.max_sample_mask_words,
+            timestamp_compute_and_graphics                        : if value.timestamp_compute_and_graphics == vk::TRUE { true } else { false },
+            timestamp_period                                      : value.timestamp_period,
+            max_clip_distances                                    : value.max_clip_distances,
+            max_cull_distances                                    : value.max_cull_distances,
+            max_combined_clip_and_cull_distances                  : value.max_combined_clip_and_cull_distances,
+            discrete_queue_priorities                             : value.discrete_queue_priorities,
+            point_size_range                                      : value.point_size_range,
+            line_width_range                                      : value.line_width_range,
+            point_size_granularity                                : value.point_size_granularity,
+            line_width_granularity                                : value.line_width_granularity,
+            strict_lines                                          : if value.strict_lines == vk::TRUE { true } else { false },
+            standard_sample_locations                             : if value.standard_sample_locations == vk::TRUE { true } else { false },
+            optimal_buffer_copy_offset_alignment                  : value.optimal_buffer_copy_offset_alignment,
+            optimal_buffer_copy_row_pitch_alignment               : value.optimal_buffer_copy_row_pitch_alignment,
+            non_coherent_atom_size                                : value.non_coherent_atom_size,            
+        }
+    }
+}
+
+impl From<PhysicalDeviceLimits> for vk::PhysicalDeviceLimits {
+    #[inline]
+    fn from(value: PhysicalDeviceLimits) -> Self {
+        Self {
+            max_image_dimension1_d                                : value.max_image_dimension_1d,
+            max_image_dimension2_d                                : value.max_image_dimension_2d,
+            max_image_dimension3_d                                : value.max_image_dimension_3d,
+            max_image_dimension_cube                              : value.max_image_dimension_cube,
+            max_image_array_layers                                : value.max_image_array_layers,
+            max_texel_buffer_elements                             : value.max_texel_buffer_elements,
+            max_uniform_buffer_range                              : value.max_uniform_buffer_range,
+            max_storage_buffer_range                              : value.max_storage_buffer_range,
+            max_push_constants_size                               : value.max_push_constants_size,
+            max_memory_allocation_count                           : value.max_memory_allocation_count,
+            max_sampler_allocation_count                          : value.max_sampler_allocation_count,
+            buffer_image_granularity                              : value.buffer_image_granularity,
+            sparse_address_space_size                             : value.sparse_address_space_size,
+            max_bound_descriptor_sets                             : value.max_bound_descriptor_sets,
+            max_per_stage_descriptor_samplers                     : value.max_per_stage_descriptor_samplers,
+            max_per_stage_descriptor_uniform_buffers              : value.max_per_stage_descriptor_uniform_buffers,
+            max_per_stage_descriptor_storage_buffers              : value.max_per_stage_descriptor_storage_buffers,
+            max_per_stage_descriptor_sampled_images               : value.max_per_stage_descriptor_sampled_images,
+            max_per_stage_descriptor_storage_images               : value.max_per_stage_descriptor_storage_images,
+            max_per_stage_descriptor_input_attachments            : value.max_per_stage_descriptor_input_attachments,
+            max_per_stage_resources                               : value.max_per_stage_resources,
+            max_descriptor_set_samplers                           : value.max_descriptor_set_samplers,
+            max_descriptor_set_uniform_buffers                    : value.max_descriptor_set_uniform_buffers,
+            max_descriptor_set_uniform_buffers_dynamic            : value.max_descriptor_set_uniform_buffers_dynamic,
+            max_descriptor_set_storage_buffers                    : value.max_descriptor_set_storage_buffers,
+            max_descriptor_set_storage_buffers_dynamic            : value.max_descriptor_set_storage_buffers_dynamic,
+            max_descriptor_set_sampled_images                     : value.max_descriptor_set_sampled_images,
+            max_descriptor_set_storage_images                     : value.max_descriptor_set_storage_images,
+            max_descriptor_set_input_attachments                  : value.max_descriptor_set_input_attachments,
+            max_vertex_input_attributes                           : value.max_vertex_input_attributes,
+            max_vertex_input_bindings                             : value.max_vertex_input_bindings,
+            max_vertex_input_attribute_offset                     : value.max_vertex_input_attribute_offset,
+            max_vertex_input_binding_stride                       : value.max_vertex_input_binding_stride,
+            max_vertex_output_components                          : value.max_vertex_output_components,
+            max_tessellation_generation_level                     : value.max_tessellation_generation_level,
+            max_tessellation_patch_size                           : value.max_tessellation_patch_size,
+            max_tessellation_control_per_vertex_input_components  : value.max_tessellation_control_per_vertex_input_components,
+            max_tessellation_control_per_vertex_output_components : value.max_tessellation_control_per_vertex_output_components,
+            max_tessellation_control_per_patch_output_components  : value.max_tessellation_control_per_patch_output_components,
+            max_tessellation_control_total_output_components      : value.max_tessellation_control_total_output_components,
+            max_tessellation_evaluation_input_components          : value.max_tessellation_evaluation_input_components,
+            max_tessellation_evaluation_output_components         : value.max_tessellation_evaluation_output_components,
+            max_geometry_shader_invocations                       : value.max_geometry_shader_invocations,
+            max_geometry_input_components                         : value.max_geometry_input_components,
+            max_geometry_output_components                        : value.max_geometry_output_components,
+            max_geometry_output_vertices                          : value.max_geometry_output_vertices,
+            max_geometry_total_output_components                  : value.max_geometry_total_output_components,
+            max_fragment_input_components                         : value.max_fragment_input_components,
+            max_fragment_output_attachments                       : value.max_fragment_output_attachments,
+            max_fragment_dual_src_attachments                     : value.max_fragment_dual_src_attachments,
+            max_fragment_combined_output_resources                : value.max_fragment_combined_output_resources,
+            max_compute_shared_memory_size                        : value.max_compute_shared_memory_size,
+            max_compute_work_group_count                          : value.max_compute_work_group_count,
+            max_compute_work_group_invocations                    : value.max_compute_work_group_invocations,
+            max_compute_work_group_size                           : value.max_compute_work_group_size,
+            sub_pixel_precision_bits                              : value.sub_pixel_precision_bits,
+            sub_texel_precision_bits                              : value.sub_texel_precision_bits,
+            mipmap_precision_bits                                 : value.mipmap_precision_bits,
+            max_draw_indexed_index_value                          : value.max_draw_indexed_index_value,
+            max_draw_indirect_count                               : value.max_draw_indirect_count,
+            max_sampler_lod_bias                                  : value.max_sampler_lod_bias,
+            max_sampler_anisotropy                                : value.max_sampler_anisotropy,
+            max_viewports                                         : value.max_viewports,
+            max_viewport_dimensions                               : value.max_viewport_dimensions,
+            viewport_bounds_range                                 : value.viewport_bounds_range,
+            viewport_sub_pixel_bits                               : value.viewport_sub_pixel_bits,
+            min_memory_map_alignment                              : value.min_memory_map_alignment,
+            min_texel_buffer_offset_alignment                     : value.min_texel_buffer_offset_alignment,
+            min_uniform_buffer_offset_alignment                   : value.min_uniform_buffer_offset_alignment,
+            min_storage_buffer_offset_alignment                   : value.min_storage_buffer_offset_alignment,
+            min_texel_offset                                      : value.min_texel_offset,
+            max_texel_offset                                      : value.max_texel_offset,
+            min_texel_gather_offset                               : value.min_texel_gather_offset,
+            max_texel_gather_offset                               : value.max_texel_gather_offset,
+            min_interpolation_offset                              : value.min_interpolation_offset,
+            max_interpolation_offset                              : value.max_interpolation_offset,
+            sub_pixel_interpolation_offset_bits                   : value.sub_pixel_interpolation_offset_bits,
+            max_framebuffer_width                                 : value.max_framebuffer_width,
+            max_framebuffer_height                                : value.max_framebuffer_height,
+            max_framebuffer_layers                                : value.max_framebuffer_layers,
+            framebuffer_color_sample_counts                       : value.framebuffer_color_sample_counts.into(),
+            framebuffer_depth_sample_counts                       : value.framebuffer_depth_sample_counts.into(),
+            framebuffer_stencil_sample_counts                     : value.framebuffer_stencil_sample_counts.into(),
+            framebuffer_no_attachments_sample_counts              : value.framebuffer_no_attachments_sample_counts.into(),
+            max_color_attachments                                 : value.max_color_attachments,
+            sampled_image_color_sample_counts                     : value.sampled_image_color_sample_counts.into(),
+            sampled_image_integer_sample_counts                   : value.sampled_image_integer_sample_counts.into(),
+            sampled_image_depth_sample_counts                     : value.sampled_image_depth_sample_counts.into(),
+            sampled_image_stencil_sample_counts                   : value.sampled_image_stencil_sample_counts.into(),
+            storage_image_sample_counts                           : value.storage_image_sample_counts.into(),
+            max_sample_mask_words                                 : value.max_sample_mask_words,
+            timestamp_compute_and_graphics                        : if value.timestamp_compute_and_graphics { vk::TRUE } else { vk::FALSE },
+            timestamp_period                                      : value.timestamp_period,
+            max_clip_distances                                    : value.max_clip_distances,
+            max_cull_distances                                    : value.max_cull_distances,
+            max_combined_clip_and_cull_distances                  : value.max_combined_clip_and_cull_distances,
+            discrete_queue_priorities                             : value.discrete_queue_priorities,
+            point_size_range                                      : value.point_size_range,
+            line_width_range                                      : value.line_width_range,
+            point_size_granularity                                : value.point_size_granularity,
+            line_width_granularity                                : value.line_width_granularity,
+            strict_lines                                          : if value.strict_lines { vk::TRUE } else { vk::FALSE },
+            standard_sample_locations                             : if value.standard_sample_locations { vk::TRUE } else { vk::FALSE },
+            optimal_buffer_copy_offset_alignment                  : value.optimal_buffer_copy_offset_alignment,
+            optimal_buffer_copy_row_pitch_alignment               : value.optimal_buffer_copy_row_pitch_alignment,
+            non_coherent_atom_size                                : value.non_coherent_atom_size,
+        }
+    }
+}
+
+
+
+/// A struct describing the sparse matrix properties supported by a PhysicalDevice.
+#[derive(Clone, Debug)]
+pub struct PhysicalDeviceSparseProperties {
+    /// Indicates whether the device uses the standard-defined image block shapes for all single-sample, 2D sparse resources.
+    pub standard_2d_block_shape             : bool,
+    /// Indicates whether the device uses the standard-defined image block shapes for all multi-sample, 2D sparse resources.
+    pub standard_2d_multisample_block_shape : bool,
+    /// Indicates whether the device uses the standard-defined image block shapes for all single-sample, 3D sparse resources.
+    pub standard_3d_block_shape             : bool,
+    /// Indicates whether the device may place mip level dimensions that are not integer multiples of the corresponding dimensions of the sparse block image in the mip tail.
+    pub aligned_mip_size                    : bool,
+    /// Indicates whether the device can consistently access non-resident regions of a resource. Any such regions will be treated as-if they always contain 0.
+    pub non_resident_strict                 : bool,
+}
+
+impl From<vk::PhysicalDeviceSparseProperties> for PhysicalDeviceSparseProperties {
+    #[inline]
+    fn from(value: vk::PhysicalDeviceSparseProperties) -> Self {
+        Self {
+            standard_2d_block_shape             : value.residency_standard2_d_block_shape == vk::TRUE,
+            standard_2d_multisample_block_shape : value.residency_standard2_d_multisample_block_shape == vk::TRUE,
+            standard_3d_block_shape             : value.residency_standard3_d_block_shape == vk::TRUE,
+            aligned_mip_size                    : value.residency_aligned_mip_size == vk::TRUE,
+            non_resident_strict                 : value.residency_non_resident_strict == vk::TRUE,
+        }
+    }
+}
+
+impl From<PhysicalDeviceSparseProperties> for vk::PhysicalDeviceSparseProperties {
+    #[inline]
+    fn from(value: PhysicalDeviceSparseProperties) -> Self {
+        Self {
+            residency_standard2_d_block_shape             : if value.standard_2d_block_shape { vk::TRUE } else { vk::FALSE },
+            residency_standard2_d_multisample_block_shape : if value.standard_2d_multisample_block_shape { vk::TRUE } else { vk::FALSE },
+            residency_standard3_d_block_shape             : if value.standard_3d_block_shape { vk::TRUE } else { vk::FALSE },
+            residency_aligned_mip_size                    : if value.aligned_mip_size { vk::TRUE } else { vk::FALSE },
+            residency_non_resident_strict                 : if value.non_resident_strict { vk::TRUE } else { vk::FALSE },
         }
     }
 }
