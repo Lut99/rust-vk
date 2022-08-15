@@ -2,6 +2,17 @@
 This file will maintain a list of changes per release of the rust-vk crate.
 
 
+## [4.0.2] - 2022-08-13
+### Added
+- Minimal settings for a Visual Studio Code workspace that configures Intellijsense to check with the `log` and `winit` features enabled.
+
+### Changed
+- Changed `SampleCount` auxillary enum to a flag (`SampleCount` in singular form, `SampleCountFlags` into multi-form).
+
+### Fixed
+- Converting from `vk::PhysicalDeviceLimits` to `PhysicalDeviceLimits` panicking due to an invalid value found for the `SampleCount` enum.
+
+
 ## [4.0.1] - 2022-08-13
 ### Fixed
 - Old reference to `device_name` and `device_type` in the `Device`'s constructor.
