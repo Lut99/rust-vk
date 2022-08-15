@@ -1,17 +1,16 @@
-/* FLAGS.rs
- *   by Lut99
- *
- * Created:
- *   09 Jul 2022, 10:44:36
- * Last edited:
- *   10 Jul 2022, 15:58:44
- * Auto updated?
- *   Yes
- *
- * Description:
- *   Contains auxillary Flag-structs used as representatives of Vulkan
- *   flags.
-**/
+//  FLAGS.rs
+//    by Lut99
+// 
+//  Created:
+//    09 Jul 2022, 10:44:36
+//  Last edited:
+//    15 Aug 2022, 17:55:01
+//  Auto updated?
+//    Yes
+// 
+//  Description:
+//!   Contains auxillary Flag-structs used as representatives of Vulkan
+// 
 
 use std::cmp::PartialEq;
 use std::fmt::{Debug, Display};
@@ -874,7 +873,7 @@ flags_from!(vk::DependencyFlags, DependencyFlags,
 
 
 flags_single_new!(
-    /// The ShaderStage where a shader or a resource lives.
+    /// The Pipeline stage where a shader or a resource lives.
     PipelineStage(u32), PipelineStageFlags,
     {
         /// Defines the stage before anything of the pipeline is run.
@@ -1166,4 +1165,49 @@ flags_from!(vk::BufferUsageFlags, BufferUsageFlags,
     vk::BufferUsageFlags::INDEX_BUFFER         => BufferUsageFlags::INDEX_BUFFER,
     vk::BufferUsageFlags::VERTEX_BUFFER        => BufferUsageFlags::VERTEX_BUFFER,
     vk::BufferUsageFlags::INDIRECT_BUFFER      => BufferUsageFlags::INDIRECT_BUFFER,
+);
+
+
+
+
+
+/***** IMAGES *****/
+flags_single_new!(
+    /// Defines the number of samples to multi-sample.
+    SampleCount(u8), SampleCountFlags,
+    {
+        /// Only one sample
+        ONE        = 0x01,
+        /// Take two samples
+        TWO        = 0x02,
+        /// Take four samples
+        FOUR       = 0x04,
+        /// Take eight samples
+        EIGHT      = 0x08,
+        /// Now we're getting somewhere: sixteen samples
+        SIXTEEN    = 0x10,
+        /// _Hardcore_: thirty-two samples!
+        THIRTY_TWO = 0x20,
+        /// What?! Sixty-four whole samples?! :O
+        SIXTY_FOUR = 0x40,
+    },
+    {
+        ONE        => "1",
+        TWO        => "2",
+        FOUR       => "4",
+        EIGHT      => "8",
+        SIXTEEN    => "16",
+        THIRTY_TWO => "32",
+        SIXTY_FOUR => "64",
+    },
+);
+
+flags_single_from!(vk::SampleCountFlags, SampleCount, SampleCountFlags,
+    vk::SampleCountFlags::TYPE_1  => ONE,
+    vk::SampleCountFlags::TYPE_2  => TWO,
+    vk::SampleCountFlags::TYPE_4  => FOUR,
+    vk::SampleCountFlags::TYPE_8  => EIGHT,
+    vk::SampleCountFlags::TYPE_16 => SIXTEEN,
+    vk::SampleCountFlags::TYPE_32 => THIRTY_TWO,
+    vk::SampleCountFlags::TYPE_64 => SIXTY_FOUR,
 );

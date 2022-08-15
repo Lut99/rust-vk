@@ -4,7 +4,7 @@
 //  Created:
 //    09 Jul 2022, 12:22:50
 //  Last edited:
-//    13 Aug 2022, 17:11:35
+//    15 Aug 2022, 17:58:51
 //  Auto updated?
 //    Yes
 // 
@@ -34,7 +34,7 @@ use crate::auxillary::enums::{
     ImageFormat, ImageLayout,
     LogicOp,
     MemoryAllocatorKind,
-    SampleCount, SharingMode, StencilOp,
+    SharingMode, StencilOp,
     QueueKind,
     VertexInputRate, VertexTopology,
 };
@@ -46,7 +46,7 @@ use crate::auxillary::flags::{
     HeapPropertyFlags,
     MemoryPropertyFlags,
     PipelineStage,
-    ShaderStage,
+    SampleCount, SampleCountFlags, ShaderStage,
 };
 use crate::instance::Instance;
 
@@ -526,16 +526,16 @@ pub struct PhysicalDeviceLimits {
     pub max_framebuffer_width : u32,
     pub max_framebuffer_height : u32,
     pub max_framebuffer_layers : u32,
-    pub framebuffer_color_sample_counts : SampleCount,
-    pub framebuffer_depth_sample_counts : SampleCount,
-    pub framebuffer_stencil_sample_counts : SampleCount,
-    pub framebuffer_no_attachments_sample_counts : SampleCount,
+    pub framebuffer_color_sample_counts : SampleCountFlags,
+    pub framebuffer_depth_sample_counts : SampleCountFlags,
+    pub framebuffer_stencil_sample_counts : SampleCountFlags,
+    pub framebuffer_no_attachments_sample_counts : SampleCountFlags,
     pub max_color_attachments : u32,
-    pub sampled_image_color_sample_counts : SampleCount,
-    pub sampled_image_integer_sample_counts : SampleCount,
-    pub sampled_image_depth_sample_counts : SampleCount,
-    pub sampled_image_stencil_sample_counts : SampleCount,
-    pub storage_image_sample_counts : SampleCount,
+    pub sampled_image_color_sample_counts : SampleCountFlags,
+    pub sampled_image_integer_sample_counts : SampleCountFlags,
+    pub sampled_image_depth_sample_counts : SampleCountFlags,
+    pub sampled_image_stencil_sample_counts : SampleCountFlags,
+    pub storage_image_sample_counts : SampleCountFlags,
     pub max_sample_mask_words : u32,
     pub timestamp_compute_and_graphics : bool,
     pub timestamp_period : f32,

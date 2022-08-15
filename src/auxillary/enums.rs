@@ -4,7 +4,7 @@
 //  Created:
 //    09 Jul 2022, 12:23:22
 //  Last edited:
-//    11 Aug 2022, 16:49:27
+//    15 Aug 2022, 17:55:13
 //  Auto updated?
 //    Yes
 // 
@@ -653,37 +653,6 @@ enum_from!(impl From<vk::PolygonMode> for DrawMode {
     vk::PolygonMode::POINT => DrawMode::Point,
     vk::PolygonMode::LINE  => DrawMode::Line,
     vk::PolygonMode::FILL  => DrawMode::Fill,
-});
-
-
-
-/// Defines a possible number of samples.
-#[derive(Clone, Copy, Debug)]
-pub enum SampleCount {
-    /// Only one sample
-    One,
-    /// Take two samples
-    Two,
-    /// Take four samples
-    Four,
-    /// Take eight samples
-    Eight,
-    /// Now we're getting somewhere: sixteen samples
-    Sixteen,
-    /// _Hardcore_: thirty-two samples!
-    ThirtyTwo,
-    /// What?! Sixty-four whole samples?! :0
-    SixtyFour,
-}
-
-enum_from!(impl From<vk::SampleCountFlags> for SampleCount {
-    vk::SampleCountFlags::TYPE_1  => SampleCount::One,
-    vk::SampleCountFlags::TYPE_2  => SampleCount::Two,
-    vk::SampleCountFlags::TYPE_4  => SampleCount::Four,
-    vk::SampleCountFlags::TYPE_8  => SampleCount::Eight,
-    vk::SampleCountFlags::TYPE_16 => SampleCount::Sixteen,
-    vk::SampleCountFlags::TYPE_32 => SampleCount::ThirtyTwo,
-    vk::SampleCountFlags::TYPE_64 => SampleCount::SixtyFour,
 });
 
 
